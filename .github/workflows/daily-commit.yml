@@ -2,10 +2,8 @@ name: Daily Commit
 
 on:
   schedule:
-    # Runs every day at 02:00 UTC
-    - cron: '0 2 * * *'
-
-  workflow_dispatch: # Allows manual triggering
+    - cron: '0 2 * * *'  # Runs daily at 02:00 UTC
+  workflow_dispatch:  # Allows manual execution
 
 jobs:
   commit:
@@ -13,18 +11,30 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # Ensures manual authentication is used
 
       - name: Set Git Config (21f1000589@ds.study.iitm.ac.in)
         run: |
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "21f1000589@ds.study.iitm.ac.in"
 
-      - name: Make a Change
+      - name: Ensure last-run.txt Exists
         run: |
-          echo "Last run: $(date)" > last-run.txt
+          if [ ! -f last-run.txt ]; then
+            echo "Creating last-run.txt..."
+            echo "Initial run: $(date)" > last-run.txt
+          fi
+
+      - name: Update last-run.txt
+        run: |
+          echo "Last run: $(date)" >> last-run.txt
+          echo "Random Number: $RANDOM" >> last-run.txt  # Forces a change
 
       - name: Commit and Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add last-run.txt
-          git commit -m "Daily commit - $(date)"
-          git push
+          git commit -m "Daily commit - $(date)" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
