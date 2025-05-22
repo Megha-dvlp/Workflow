@@ -1,0 +1,19 @@
+name: My Custom Action
+
+on:
+  push:
+    branches:
+      - main # This robot wakes up when you put new code into the 'main' part of your project
+  workflow_dispatch: # This lets you press a button to make the robot start whenever you want
+
+jobs:
+  my_first_job:
+    runs-on: ubuntu-latest # The robot runs on a computer like Linux
+    steps:
+      - name: Get your project code
+        uses: actions/checkout@v4 # This step makes sure the robot can see your project files
+
+      - name: 21f1000589@ds.study.iitm.ac.in - My Super Special Step
+        run: |
+          echo "Hi! I'm your robot, and I'm running this task!"
+          echo "My name for this task has your email: 21f1000589@ds.study.iitm.ac.in"
